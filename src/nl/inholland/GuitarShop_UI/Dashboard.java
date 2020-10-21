@@ -1,5 +1,6 @@
 package nl.inholland.GuitarShop_UI;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -12,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.*;
 
 import java.util.Calendar;
@@ -20,7 +22,7 @@ import java.util.Date;
 public class Dashboard {
     Stage window;
 
-    public Dashboard(Gebruiker ingelogdeGebruiker) {
+    public Dashboard(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase) {
         window = new Stage();
 
         window.setHeight(800);
@@ -51,7 +53,7 @@ public class Dashboard {
         //Sales
         Menu verkopenMenu = new Menu("Verkopen");
 
-        MenuItem verkopenBestellingMenuItem = new MenuItem("Bestelling");
+        MenuItem verkopenBestellingMenuItem = new MenuItem("Bestelling aanmaken");
         verkopenMenu.getItems().add(verkopenBestellingMenuItem);
 
         MenuItem verkopenBestellingenlijstMenuItem = new MenuItem("Bestellingenlijst");
@@ -63,8 +65,8 @@ public class Dashboard {
         MenuItem voorraadBestellingMenuItem = new MenuItem("Bestellingenlijst");
         voorraadMenu.getItems().add(voorraadBestellingMenuItem);
 
-        MenuItem voorraadOnderhoudMenuItem = new MenuItem("Onderhoud");
-        voorraadMenu.getItems().add(voorraadOnderhoudMenuItem);
+        MenuItem voorraadBeheerMenuItem = new MenuItem("Voorraadbeheer");
+        voorraadMenu.getItems().add(voorraadBeheerMenuItem);
 
         welkomsberichtLabel.setFont(new Font(30));
         //menuAction(dashboardMenu);
@@ -72,7 +74,31 @@ public class Dashboard {
         //menuAction(stockMenu);
 
         //dashboardMenu.setOnAction(actionEvent -> {new MainView(loggedInUser); window.close();});
-        verkopenBestellingMenuItem.setOnAction(actionEvent -> {new BestellingMaken(ingelogdeGebruiker); window.close();});
+        dashboardMenu.setOnAction(actionEvent -> {
+            sluitAlleWindows();
+            new Dashboard(ingelogdeGebruiker, gitaarDatabase); window.close();
+        });
+
+        verkopenBestellingMenuItem.setOnAction(actionEvent -> {
+            sluitAlleWindows();
+            new BestellingMaken(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
+        });
+
+        verkopenBestellingenlijstMenuItem.setOnAction(actionEvent -> {
+            sluitAlleWindows();
+            new BestellingLijst(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
+        });
+
+        voorraadBestellingMenuItem.setOnAction(actionEvent -> {
+            sluitAlleWindows();
+            new BestellingLijst(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
+        });
+
+        voorraadBeheerMenuItem.setOnAction(actionEvent -> {
+            sluitAlleWindows();
+            new Voorraadonderhoud(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
+        });
+
         //stockMenu.setOnAction(actionEvent -> {new TeacherView(loggedInUser); window.close();});
 
 
@@ -96,5 +122,10 @@ public class Dashboard {
         menu.getItems().add(menuItem);
         menu.addEventHandler(Menu.ON_SHOWN, event -> menu.hide());
         menu.addEventHandler(Menu.ON_SHOWING, event -> menu.fire());
+    }
+
+    public void sluitAlleWindows()
+    {
+        //Platform.exit();
     }
 }

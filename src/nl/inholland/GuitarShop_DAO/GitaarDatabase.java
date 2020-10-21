@@ -12,17 +12,25 @@ import java.util.Scanner;
 
 public class GitaarDatabase {
 
-    private List<Klant> klanten = new ArrayList<>();
 
-    public List<Klant> verkrijgKlanten() {
-        return klanten;
+    private List<AfgerondeBestelling> afgerondeBestellingen;
+    private List<Klant> klanten = new ArrayList<>();
+    private List<Verkoper> verkopers;
+    private List<Artikel> artikelen = new ArrayList<>();
+    private List<Manager> managers;
+
+
+    public List<AfgerondeBestelling> verkrijgAfgerondeBestellingen() {
+        return afgerondeBestellingen;
     }
 
+    public void zetAfgerondeBestellingen(List<AfgerondeBestelling> afgerondeBestellingen) {
+        this.afgerondeBestellingen = afgerondeBestellingen;
+    }
 
-    private List<Artikel> artikelen = new ArrayList<>();
-
-    public List<Artikel> verkrijgArtikelen() {
-        return artikelen;
+    public void voegToeAanAfgerondeBestellingen(Bestelling bestelling) {
+        AfgerondeBestelling afgerondeBestelling = new AfgerondeBestelling(bestelling);
+        this.afgerondeBestellingen.add(afgerondeBestelling);
     }
 
     public Integer verkrijgVoorraadVanArtikel(Artikel artikel) {
@@ -36,21 +44,25 @@ public class GitaarDatabase {
         return 0;
     }
 
+    public List<Artikel> verkrijgArtikelen() {
+        return artikelen;
+    }
 
-    private List<Manager> managers;
+    public List<Klant> verkrijgKlanten() {
+        return klanten;
+    }
+
 
     public List<Manager> verkrijgManagers() {
         return managers;
     }
-
-
-    private List<Verkoper> verkopers;
 
     public List<Verkoper> verkrijgVerkopers() {
         return verkopers;
     }
 
     public GitaarDatabase() {
+        afgerondeBestellingen = new ArrayList<>();
         klanten = new ArrayList<>();
         managers = new ArrayList<>();
         verkopers = new ArrayList<>();

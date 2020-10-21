@@ -34,18 +34,18 @@ public class App extends Application {
         grid.setVgap(10);
         grid.setHgap(10);
 
-        Label userLabel = new Label("Username: ");
+        Label userLabel = new Label("Gebruikersnaam: ");
         GridPane.setConstraints(userLabel, 0, 0);
 
-        Label passwordLabel = new Label("Password: ");
+        Label passwordLabel = new Label("Wachtwoord: ");
         GridPane.setConstraints(passwordLabel, 0, 1);
 
         TextField userInput = new TextField();
-        userInput.setPromptText("Username: ");
+        userInput.setPromptText("Gebruikersnaam");
         GridPane.setConstraints(userInput, 1, 0);
 
         TextField passwordInput = new PasswordField();
-        userInput.setPromptText("Password: ");
+        passwordInput.setPromptText("Wachtwoord");
         GridPane.setConstraints(passwordInput, 1, 1);
 
         Button loginButton = new Button("Log in");
@@ -71,7 +71,7 @@ public class App extends Application {
 
                 if (gebruiker != null)
                 {
-                    new Dashboard(gebruiker);
+                    new Dashboard(gebruiker, gitaarDatabase);
                     window.close();
                 }
             }

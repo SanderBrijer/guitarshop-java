@@ -7,17 +7,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.*;
-
-import javafx.scene.control.TextField;
 
 import javafx.scene.paint.Color;
 
@@ -42,11 +37,11 @@ public class BestellingMaken {
 
     //labels
     Label klantVoornaamLabel;
-    Label klantAchternaamLabel ;
+    Label klantAchternaamLabel;
     Label klantAdresLabel;
     Label klantStadLabel;
     Label klantTelefoonnummerLabel;
-    Label klantEmailadresLabel ;
+    Label klantEmailadresLabel;
 
     Label klantVoornaamUitvoerLabel;
     Label klantAchternaamUitvoerLabel;
@@ -55,8 +50,8 @@ public class BestellingMaken {
     Label klantTelefoonnummerUitvoerLabel;
     Label klantEmailadresUitvoerLabel;
 
-    public BestellingMaken(Gebruiker ingelogdeGebruiker) {
-        database = new GitaarDatabase();
+    public BestellingMaken(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase, MenuBar menu) {
+        this.database = gitaarDatabase;
         artikelenTableView = new TableView<>();
         artikelenLijst = new ArrayList<Artikel>();
         bestelling = new Bestelling();
@@ -75,7 +70,6 @@ public class BestellingMaken {
         klantStadUitvoerLabel = new Label();
         klantTelefoonnummerUitvoerLabel = new Label();
         klantEmailadresUitvoerLabel = new Label();
-
 
 
         window = new Stage();
@@ -98,6 +92,7 @@ public class BestellingMaken {
         Label title = new Label("Nieuwe bestelling aanmaken: ");
         Label klantLabel = new Label("Klant");
         TextField klantNaamInvoer = new TextField();
+        klantNaamInvoer.setPromptText("Naam klant");
         Button klantZoekenKnop = new Button("Zoeken");
 
         klantZoekenKnop.setOnAction(new EventHandler<ActionEvent>() {
@@ -112,7 +107,6 @@ public class BestellingMaken {
                 klantNaamInvoer.clear();
             }
         });
-
 
 
         Label titelTabel = new Label("Artikelen");
@@ -139,8 +133,6 @@ public class BestellingMaken {
         artikelenTableView.getColumns().addAll(aantalColumn, merkColumn, modelColumn, akoestischColumn, typeColumn, prijsColumn);
 
 
-
-
         Button verwijderenArtikelKnop = new Button("Verwijderen artikel");
         Button toevoegenArtikelKnop = new Button("Toevoegen artikel");
         Button bevestigArtikelenKnop = new Button("Bevestig");
@@ -151,8 +143,7 @@ public class BestellingMaken {
             @Override
             public void handle(ActionEvent actionEvent) {
                 artikelToevoegen = new ArtikelToevoegen(database);
-                if (artikelToevoegen.verkrijgBestelling() != null)
-                {
+                if (artikelToevoegen.verkrijgBestelling() != null) {
                     BesteldeItem besteldeItem = artikelToevoegen.verkrijgBestelling();
                     bestelling.toevoegenAanBesteldeItems(besteldeItem);
                 }
@@ -165,8 +156,18 @@ public class BestellingMaken {
             public void handle(ActionEvent actionEvent) {
                 BesteldeItem besteldeItem = artikelenTableView.getSelectionModel().getSelectedItem();
                 verwijderArtikelUitLijst(besteldeItem);
-                new BestellingMaken(ingelogdeGebruiker);
-                window.close();
+                vulTableViewBestellingen();
+            }
+        });
+
+        resetArtikelenKnop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                while (artikelenTableView.getItems().size() != 0) {
+                    BesteldeItem besteldeItem = artikelenTableView.getItems().get(0);
+                    verwijderArtikelUitLijst(besteldeItem);
+                    vulTableViewBestellingen();
+                }
             }
         });
 
@@ -174,20 +175,17 @@ public class BestellingMaken {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (klant != null) {
-                    if (bestelling.verkrijgBesteldeItems().size() <= 0)
-                    {
+                    if (bestelling.verkrijgBesteldeItems().size() <= 0) {
                         String st = "Er zijn geen artikelen toegevoegd.";
                         JOptionPane.showMessageDialog(null, st);
-                    }
-                    else
-                    {
+                    } else {
                         bestelling.zetKlant(klant);
                         BevestigBestelling bevestigBestelling = new BevestigBestelling(bestelling, database);
+                        window.close();
+                        new Dashboard(ingelogdeGebruiker, database);
 
                     }
-                }
-                else
-                {
+                } else {
                     String st = "Er is geen klant ingevoerd";
                     JOptionPane.showMessageDialog(null, st);
                 }
@@ -263,7 +261,7 @@ public class BestellingMaken {
 
         content.getChildren().addAll(borderPaneKlantOpzoeken, borderPaneArtikelenTableView);
 
-
+        container.setTop(menu);
         container.setCenter(content);
 
         // Set scene
@@ -279,10 +277,8 @@ public class BestellingMaken {
         return klanten.stream().filter(klant -> klant.verkrijgVoornaam().toLowerCase().contains(naam.toLowerCase())).collect(Collectors.toList());
     }
 
-    public void vulKlantInfo(Klant klant)
-    {
-        if (klant != null)
-        {
+    public void vulKlantInfo(Klant klant) {
+        if (klant != null) {
             klantVoornaamUitvoerLabel.setText(klant.verkrijgVoornaam());
             klantAchternaamUitvoerLabel.setText(klant.verkrijgAchternaam());
             klantAdresUitvoerLabel.setText(klant.verkrijgAdres());
@@ -292,24 +288,19 @@ public class BestellingMaken {
         }
     }
 
-    public void vulTableViewBestellingen()
-    {
-
+    public void vulTableViewBestellingen() {
         try {
             ObservableList<BesteldeItem> mapMetBestellingen = FXCollections.observableList(bestelling.verkrijgBesteldeItems());
 
-            if (mapMetBestellingen != null)
-            {
+            if (mapMetBestellingen != null) {
                 artikelenTableView.setItems(mapMetBestellingen);
             }
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
 
         }
     }
 
-    public void verwijderArtikelUitLijst(BesteldeItem besteldeItem)
-    {
+    public void verwijderArtikelUitLijst(BesteldeItem besteldeItem) {
         bestelling.verwijderVanBesteldeItems(besteldeItem);
         database.verhoogVoorraadArtikel(besteldeItem.verkrijgArtikel(), besteldeItem.verkrijgAantalBesteld());
     }

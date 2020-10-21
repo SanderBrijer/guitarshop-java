@@ -151,7 +151,8 @@ public class BevestigBestelling {
         btnBevestigBestelling.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-
+                gitaarDatabase.voegToeAanAfgerondeBestellingen(bestelling);
+                window.close();
             }
         });
 

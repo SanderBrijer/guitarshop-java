@@ -24,6 +24,8 @@ import nl.inholland.GuitarShop_Models.*;
 import nl.inholland.GuitarShop_Service.Artikelen_Service;
 import nl.inholland.GuitarShop_Service.TabelWaarden;
 
+import javax.swing.*;
+
 public class ArtikelToevoegen {
     private final Stage window;
     private ObservableList<Artikel> artikelen;
@@ -111,6 +113,7 @@ public class ArtikelToevoegen {
 
 
         TextField aantalArtikelenTextField = new TextField();
+        aantalArtikelenTextField.setPromptText("Aantal");
         Button toevoegenArtikelKnop = new Button("Toevoegen");
         Button annulerenToevoegenArtikelKnop = new Button("Annuleren");
         Label foutmeldingLabel = new Label();
@@ -123,36 +126,34 @@ public class ArtikelToevoegen {
         toevoegenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                artikelAangeklikt = artikelenTableView.getSelectionModel().getSelectedItem();
-                if (artikelAangeklikt != null)
-                {
-                    Integer aantalBesteld = 0;
-                    try
-                    {
-                        aantalBesteld = Integer.parseInt(aantalArtikelenTextField.getText());
-                        Integer aantalInVoorraad = database.verkrijgVoorraadVanArtikel(artikelAangeklikt);
+                try {
+                    artikelAangeklikt = artikelenTableView.getSelectionModel().getSelectedItem();
+                    if (artikelAangeklikt != null) {
+                        Integer aantalBesteld = 0;
+                        try {
+                            aantalBesteld = Integer.parseInt(aantalArtikelenTextField.getText());
+                            Integer aantalInVoorraad = database.verkrijgVoorraadVanArtikel(artikelAangeklikt);
 
-                        if (aantalInVoorraad >= aantalBesteld)
-                        {
-                            if (aantalBesteld > 0)
-                            {
-                                database.verlaagVoorraadArtikel(artikelAangeklikt, aantalBesteld);
-                                bestelling = new BesteldeItem(aantalBesteld, artikelAangeklikt);
-                                window.close();
+                            if (aantalInVoorraad >= aantalBesteld) {
+                                if (aantalBesteld > 0) {
+                                    database.verlaagVoorraadArtikel(artikelAangeklikt, aantalBesteld);
+                                    bestelling = new BesteldeItem(aantalBesteld, artikelAangeklikt);
+                                    window.close();
+                                } else {
+                                    foutmeldingLabel.setText("Het opgegeven aantal is onder 0.");
+                                }
+                            } else {
+                                foutmeldingLabel.setText("Er is niet genoeg in voorraad. Slechts " + aantalInVoorraad + " in voorraad.");
                             }
-                            else
-                            {
-                                foutmeldingLabel.setText("Het opgegeven aantal is onder 0.");
-                            }
-                        }
-                        else
-                        {
-                            foutmeldingLabel.setText("Er is niet genoeg in voorraad. Slechts "+ aantalInVoorraad + " in voorraad.");
+                        } catch (Exception e) {
+                            foutmeldingLabel.setText("Er is geen getal ingevoerd.");
                         }
                     }
-                    catch (Exception e) {
-                        foutmeldingLabel.setText("Er is geen getal ingevoerd.");
-                    }
+                }
+                catch(Exception exception)
+                {
+                    String st = "Er zijn geen artikelen beschikbaar.";
+                    JOptionPane.showMessageDialog(null, st);
                 }
             }
         });

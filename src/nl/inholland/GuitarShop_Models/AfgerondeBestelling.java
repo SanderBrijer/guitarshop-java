@@ -23,4 +23,22 @@ public class AfgerondeBestelling {
         this.id = this.Id;
     }
 
+
+    public Bestelling verkrijgBestelling() {
+        return bestelling;
+    }
+
+    public void zetBestelling(Bestelling bestelling) {
+        this.bestelling = bestelling;
+    }
+
+    public LocalDate verkrijgDatum() {
+        return datum;
+    }
+
+    public void zetDatum(LocalDate datum) {
+        this.datum = datum;
+    }
+
+
 }
