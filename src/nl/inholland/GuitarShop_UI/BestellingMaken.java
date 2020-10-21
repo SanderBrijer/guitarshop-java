@@ -145,7 +145,7 @@ public class BestellingMaken {
         toevoegenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                artikelToevoegen = new ArtikelToevoegen();
+                artikelToevoegen = new ArtikelToevoegen(database);
                 bestelling.toevoegenAanBesteldeItems(artikelToevoegen.verkrijgBestelling());
                 vulTableViewBestellingen();
             }
