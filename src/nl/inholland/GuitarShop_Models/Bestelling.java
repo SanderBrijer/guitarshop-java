@@ -1,19 +1,19 @@
 package nl.inholland.GuitarShop_Models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bestelling {
 
     private Klant klant;
 
-    private LocalDate datum;
 
     private List<BesteldeItem> besteldeItems;
 
     public Bestelling()
     {
-
+        besteldeItems = new ArrayList<BesteldeItem>();
     }
 
     public Klant verkrijgKlant() {
@@ -28,17 +28,14 @@ public class Bestelling {
         this.besteldeItems = besteldeItems;
     }
 
+    public void verwijderVanBesteldeItems(BesteldeItem besteldeItem) {
+        this.besteldeItems.remove(besteldeItem);
+    }
+
     public void toevoegenAanBesteldeItems(BesteldeItem besteldeItem) {
         this.besteldeItems.add(besteldeItem);
     }
 
-    public LocalDate verkrijgDatum() {
-        return datum;
-    }
-
-    public void setDatum(LocalDate datum) {
-        this.datum = datum;
-    }
 
     public List<BesteldeItem> verkrijgBesteldeItems() {
         return besteldeItems;

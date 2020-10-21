@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.*;
@@ -20,6 +21,8 @@ import javafx.scene.control.TextField;
 
 import javafx.scene.paint.Color;
 
+import javax.swing.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +33,7 @@ public class BestellingMaken {
 
     TableView<BesteldeItem> artikelenTableView;
 
+    Klant klant;
     KlantenZoekScherm klantenzoek;
     ArtikelToevoegen artikelToevoegen;
     List<Artikel> artikelenLijst;
@@ -103,7 +107,8 @@ public class BestellingMaken {
                 List<Klant> klanten = verkrijgKlantViaNaam(naam);
                 ObservableList<Klant> listKlanten = FXCollections.observableArrayList(klanten);
                 klantenzoek = new KlantenZoekScherm(listKlanten);
-                vulKlantInfo(klantenzoek.getKlantAangeklikt());
+                klant = klantenzoek.getKlantAangeklikt();
+                vulKlantInfo(klant);
                 klantNaamInvoer.clear();
             }
         });
@@ -113,22 +118,22 @@ public class BestellingMaken {
         Label titelTabel = new Label("Artikelen");
 
         TableColumn<BesteldeItem, Integer> aantalColumn = new TableColumn<>("Aantal");
-        aantalColumn.setCellValueFactory(artikel -> new SimpleObjectProperty(artikel.getValue().verkrijgAantalBesteld()));
+        aantalColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgAantalBesteld()));
 
         TableColumn<BesteldeItem, String> merkColumn = new TableColumn<>("Merk");
-        merkColumn.setCellValueFactory(artikel -> new SimpleStringProperty(artikel.getValue().verkrijgArtikel().verkrijgMerk()));
+        merkColumn.setCellValueFactory(besteldeItem -> new SimpleStringProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgMerk()));
 
         TableColumn<BesteldeItem, String> modelColumn = new TableColumn<>("Model");
-        modelColumn.setCellValueFactory(artikel -> new SimpleStringProperty(artikel.getValue().verkrijgArtikel().verkrijgModel()));
+        modelColumn.setCellValueFactory(besteldeItem -> new SimpleStringProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgModel()));
 
         TableColumn<BesteldeItem, Boolean> akoestischColumn = new TableColumn<>("Akoestisch");
-        akoestischColumn.setCellValueFactory(artikel -> new SimpleBooleanProperty(artikel.getValue().verkrijgArtikel().verkrijgAkoestisch()));
+        akoestischColumn.setCellValueFactory(besteldeItem -> new SimpleBooleanProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgAkoestisch()));
 
         TableColumn<BesteldeItem, TypeGitaar> typeColumn = new TableColumn<>("Type");
-        typeColumn.setCellValueFactory(artikel -> new SimpleObjectProperty(artikel.getValue().verkrijgArtikel().verkrijgType()));
+        typeColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgType()));
 
         TableColumn<BesteldeItem, Double> prijsColumn = new TableColumn<>("Prijs");
-        prijsColumn.setCellValueFactory(artikel -> new SimpleObjectProperty(artikel.getValue().verkrijgArtikel().verkrijgPrijs()));
+        prijsColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(Double.parseDouble(besteldeItem.getValue().verkrijgAantalBesteld().toString()) * besteldeItem.getValue().verkrijgArtikel().verkrijgPrijs()));
 
         //noinspection unchecked
         artikelenTableView.getColumns().addAll(aantalColumn, merkColumn, modelColumn, akoestischColumn, typeColumn, prijsColumn);
@@ -146,7 +151,11 @@ public class BestellingMaken {
             @Override
             public void handle(ActionEvent actionEvent) {
                 artikelToevoegen = new ArtikelToevoegen(database);
-                bestelling.toevoegenAanBesteldeItems(artikelToevoegen.verkrijgBestelling());
+                if (artikelToevoegen.verkrijgBestelling() != null)
+                {
+                    BesteldeItem besteldeItem = artikelToevoegen.verkrijgBestelling();
+                    bestelling.toevoegenAanBesteldeItems(besteldeItem);
+                }
                 vulTableViewBestellingen();
             }
         });
@@ -154,10 +163,8 @@ public class BestellingMaken {
         verwijderenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                BesteldeItem bestelling = artikelenTableView.getSelectionModel().getSelectedItem();
-                Artikel artikelAangeklikt = bestelling.verkrijgArtikel();
-                verwijderArtikelUitLijst(artikelAangeklikt);
-                database.verhoogVoorraadArtikel(artikelAangeklikt, bestelling.verkrijgAantalBesteld());
+                BesteldeItem besteldeItem = artikelenTableView.getSelectionModel().getSelectedItem();
+                verwijderArtikelUitLijst(besteldeItem);
                 new BestellingMaken(ingelogdeGebruiker);
                 window.close();
             }
@@ -166,7 +173,24 @@ public class BestellingMaken {
         bevestigArtikelenKnop.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                if (klant != null) {
+                    if (bestelling.verkrijgBesteldeItems().size() <= 0)
+                    {
+                        String st = "Er zijn geen artikelen toegevoegd.";
+                        JOptionPane.showMessageDialog(null, st);
+                    }
+                    else
+                    {
+                        bestelling.zetKlant(klant);
+                        BevestigBestelling bevestigBestelling = new BevestigBestelling(bestelling, database);
 
+                    }
+                }
+                else
+                {
+                    String st = "Er is geen klant ingevoerd";
+                    JOptionPane.showMessageDialog(null, st);
+                }
             }
         });
 
@@ -245,7 +269,7 @@ public class BestellingMaken {
         // Set scene
         Scene scene = new Scene(container);
         window.setScene(scene);
-
+        window.initModality(Modality.APPLICATION_MODAL);
         // Show window
         window.show();
     }
@@ -272,7 +296,7 @@ public class BestellingMaken {
     {
 
         try {
-            ObservableList<BesteldeItem> mapMetBestellingen = FXCollections.observableList(bestellingenLijst);
+            ObservableList<BesteldeItem> mapMetBestellingen = FXCollections.observableList(bestelling.verkrijgBesteldeItems());
 
             if (mapMetBestellingen != null)
             {
@@ -284,9 +308,10 @@ public class BestellingMaken {
         }
     }
 
-    public void verwijderArtikelUitLijst(Artikel artikel)
+    public void verwijderArtikelUitLijst(BesteldeItem besteldeItem)
     {
-        artikelenLijst.remove(artikel);
+        bestelling.verwijderVanBesteldeItems(besteldeItem);
+        database.verhoogVoorraadArtikel(besteldeItem.verkrijgArtikel(), besteldeItem.verkrijgAantalBesteld());
     }
 
 }

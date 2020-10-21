@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.Artikel;
@@ -20,12 +21,19 @@ import nl.inholland.GuitarShop_Models.BesteldeItem;
 import nl.inholland.GuitarShop_Models.Bestelling;
 import nl.inholland.GuitarShop_Models.TypeGitaar;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BestellingLijst {
     private final Stage window;
+    private List<Bestelling> bestellingLijst;
 
 
     public BestellingLijst()
     {
+        bestellingLijst = new ArrayList<Bestelling>();
+
+
         window = new Stage();
 
         // Set Window properties
@@ -85,7 +93,7 @@ public class BestellingLijst {
         // Set scene
         Scene scene = new Scene(container);
         window.setScene(scene);
-
+        window.initModality(Modality.APPLICATION_MODAL);
         // Show window
         window.show();
     }

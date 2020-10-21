@@ -17,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.*;
@@ -172,7 +173,7 @@ public class ArtikelToevoegen {
         // Set scene
         Scene scene = new Scene(container);
         window.setScene(scene);
-
+        window.initModality(Modality.APPLICATION_MODAL);
         // Show window
         window.showAndWait();
 
