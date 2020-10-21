@@ -48,25 +48,25 @@ public class BestellingLijst {
         TableView<Bestelling> bestellingTableView = new TableView<>();
 
         TableColumn<Bestelling, Integer> idKolom = new TableColumn<>("Order#");
-        idKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue().verkrijgAantalBesteld()));
+        idKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue()));
 
         TableColumn<Bestelling, String> datumKolom = new TableColumn<>("Datum");
-        datumKolom.setCellValueFactory(bestelling -> new SimpleStringProperty(bestelling.getValue().verkrijgArtikel().verkrijgMerk()));
+        datumKolom.setCellValueFactory(bestelling -> new SimpleStringProperty(bestelling.getValue().verkrijgDatum().toString()));
 
         TableColumn<Bestelling, String> klantKolom = new TableColumn<>("Klant naam");
         klantKolom.setCellValueFactory(bestelling -> new SimpleStringProperty(bestelling.getValue().verkrijgKlant().verkrijgVolledigeNaam()));
 
         TableColumn<Bestelling, String> telefoonnummerKolom = new TableColumn<>("Telefoonnummer");
-        telefoonnummerKolom.setCellValueFactory(bestelling -> new SimpleBooleanProperty(bestelling.getValue().verkrijgKlant().verkrijgTelefoonnummer()));
+        telefoonnummerKolom.setCellValueFactory(bestelling -> new SimpleStringProperty(bestelling.getValue().verkrijgKlant().verkrijgStad()));
 
         TableColumn<Bestelling, String> emailKolom = new TableColumn<>("Email");
         emailKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue().verkrijgKlant().verkrijgEmail()));
 
         TableColumn<Bestelling, Integer> prijsKolom = new TableColumn<>("Aantal");
-        prijsKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue().verkrijgBesteldeItems().get().verkrijgAantalBesteld()));
+        prijsKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue().verkrijgBesteldeItems().get(1).verkrijgAantalBesteld()));
 
         TableColumn<Bestelling, Double> totaalKolom = new TableColumn<>("Totaal");
-        totaalKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue().verkrijgBesteldeItems().get().verkrijgArtikel().verkrijgPrijs()));
+        totaalKolom.setCellValueFactory(bestelling -> new SimpleObjectProperty(bestelling.getValue().verkrijgBesteldeItems().get(1).verkrijgArtikel().verkrijgPrijs()));
 
         //noinspection unchecked
         bestellingTableView.getColumns().addAll(idKolom, datumKolom, klantKolom, telefoonnummerKolom, emailKolom, prijsKolom, totaalKolom);
