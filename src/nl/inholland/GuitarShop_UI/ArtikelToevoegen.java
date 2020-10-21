@@ -35,14 +35,18 @@ public class ArtikelToevoegen {
     private BesteldeItem bestelling;
 
     Artikel artikelAangeklikt;
-    GitaarDatabase database = new GitaarDatabase();
+    GitaarDatabase database;
     Artikelen_Service artikelen_service;
 
     public Artikel verkrijgArtikelAangeklikt() {
         return artikelAangeklikt;
     }
 
-    public ArtikelToevoegen () {
+
+
+
+    public ArtikelToevoegen (GitaarDatabase database) {
+        this.database = database;
         artikelen_service = new Artikelen_Service();
         ObservableList<Artikel> artikelen = FXCollections.observableList(database.verkrijgArtikelen());
         window = new Stage();
