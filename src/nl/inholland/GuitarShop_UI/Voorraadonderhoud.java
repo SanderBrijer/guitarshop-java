@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
@@ -22,6 +23,7 @@ import nl.inholland.GuitarShop_Models.AfgerondeBestelling;
 import nl.inholland.GuitarShop_Models.Artikel;
 import nl.inholland.GuitarShop_Models.Gebruiker;
 import nl.inholland.GuitarShop_Models.TypeGitaar;
+import nl.inholland.GuitarShop_Service.MenuBarMaker;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class Voorraadonderhoud {
     private final Stage window;
     private TableView<Artikel> artikelenTableView;
 
-    public Voorraadonderhoud(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase, MenuBar menu) {
+    public Voorraadonderhoud(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase) {
         artikelenTableView = new TableView<>();
         artikelen = new ArrayList<>();
         window = new Stage();
@@ -42,7 +44,7 @@ public class Voorraadonderhoud {
         // Set Window properties
         window.setHeight(800);
         window.setWidth(1024);
-        window.setTitle("Bestellingenlijst");
+        window.setTitle("Voorraadbeheer");
 
         // Set containers
         BorderPane container = new BorderPane();
@@ -135,7 +137,9 @@ public class Voorraadonderhoud {
         gridPaneArtikelenTableView.setHgap(10);
         gridPaneArtikelenTableView.setVgap(10);
         //ArtikelenTableView
-        gridPaneArtikelenTableView.add(new Label("Voorraadbeheer"), 0, 0);
+        Label labelVoorraad = new Label("Voorraadbeheer");
+        labelVoorraad.setFont(new Font(30));
+        gridPaneArtikelenTableView.add(labelVoorraad, 0, 0);
         gridPaneArtikelenTableView.add(artikelenTableView, 0, 3);
 
 
@@ -154,7 +158,8 @@ public class Voorraadonderhoud {
         content.getChildren().addAll(borderPaneArtikelenDisplay);
         content.getChildren().addAll();
         //container.setTop(menu);
-        container.setTop(menu);
+        MenuBarMaker menuBarMaker = new MenuBarMaker(ingelogdeGebruiker, window, gitaarDatabase);
+        container.setTop(menuBarMaker.verkrijgMenu());
         container.setCenter(content);
 
         // Set scene

@@ -17,12 +17,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.*;
 import nl.inholland.GuitarShop_Service.Artikelen_Service;
-import nl.inholland.GuitarShop_Service.TabelWaarden;
 
 import javax.swing.*;
 
@@ -55,8 +55,6 @@ public class ArtikelToevoegen {
         window = new Stage();
         this.artikelen = artikelen;
 
-        TabelWaarden dataTabel = new TabelWaarden();
-
 
         // Set Window properties
         window.setHeight(500);
@@ -75,6 +73,7 @@ public class ArtikelToevoegen {
 
 
         Label titelTabel = new Label("Artikelen");
+        titelTabel.setFont(new Font(30));
         TableView<Artikel> artikelenTableView = new TableView<>();
 
         TableColumn<Artikel, String> merkKolom = new TableColumn<>("Merk");
@@ -148,6 +147,11 @@ public class ArtikelToevoegen {
                         } catch (Exception e) {
                             foutmeldingLabel.setText("Er is geen getal ingevoerd.");
                         }
+                    }
+                    else
+                    {
+                        String st = "Selecteer een artikel.";
+                        JOptionPane.showMessageDialog(null, st);
                     }
                 }
                 catch(Exception exception)

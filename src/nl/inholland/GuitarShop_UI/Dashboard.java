@@ -1,12 +1,13 @@
 package nl.inholland.GuitarShop_UI;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -15,9 +16,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.*;
+import nl.inholland.GuitarShop_Service.MenuBarMaker;
 
+import javax.swing.*;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class Dashboard {
     Stage window;
@@ -38,74 +42,28 @@ public class Dashboard {
         content.setPadding(new Insets(10));
 
         Label welkomsberichtLabel = new Label(String.format("Welkom %s", ingelogdeGebruiker.verkrijgVoornaam() + " " + ingelogdeGebruiker.verkrijgAchternaam()));
+        welkomsberichtLabel.setFont(new Font(30));
         Label rolLabel = new Label(String.format("Rol: %s", ingelogdeGebruiker.verkrijgRol().toString()));
 
         Date vandaag = Calendar.getInstance().getTime();
         Label tijdsLabel = new Label(String.format("Datum en tijd: %s", vandaag));
 
+        Button btnUitloggen = new Button("Uitloggen");
 
-        //MENU
-        MenuBar menu = new MenuBar();
-
-        //Dashboard
-        Menu dashboardMenu = new Menu("Dashboard");
-
-        //Sales
-        Menu verkopenMenu = new Menu("Verkopen");
-
-        MenuItem verkopenBestellingMenuItem = new MenuItem("Bestelling aanmaken");
-        verkopenMenu.getItems().add(verkopenBestellingMenuItem);
-
-        MenuItem verkopenBestellingenlijstMenuItem = new MenuItem("Bestellingenlijst");
-        verkopenMenu.getItems().add(verkopenBestellingenlijstMenuItem);
-
-        //Voorraad
-        Menu voorraadMenu = new Menu("Voorraad");
-
-        MenuItem voorraadBestellingMenuItem = new MenuItem("Bestellingenlijst");
-        voorraadMenu.getItems().add(voorraadBestellingMenuItem);
-
-        MenuItem voorraadBeheerMenuItem = new MenuItem("Voorraadbeheer");
-        voorraadMenu.getItems().add(voorraadBeheerMenuItem);
-
-        welkomsberichtLabel.setFont(new Font(30));
-        //menuAction(dashboardMenu);
-        //menuAction(salesMenu);
-        //menuAction(stockMenu);
-
-        //dashboardMenu.setOnAction(actionEvent -> {new MainView(loggedInUser); window.close();});
-        dashboardMenu.setOnAction(actionEvent -> {
-            sluitAlleWindows();
-            new Dashboard(ingelogdeGebruiker, gitaarDatabase); window.close();
+        btnUitloggen.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                window.close();
+                new LoginScherm(gitaarDatabase);
+            }
         });
 
-        verkopenBestellingMenuItem.setOnAction(actionEvent -> {
-            sluitAlleWindows();
-            new BestellingMaken(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
-        });
+        MenuBarMaker menuBarMaker = new MenuBarMaker(ingelogdeGebruiker, window, gitaarDatabase);
 
-        verkopenBestellingenlijstMenuItem.setOnAction(actionEvent -> {
-            sluitAlleWindows();
-            new BestellingLijst(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
-        });
-
-        voorraadBestellingMenuItem.setOnAction(actionEvent -> {
-            sluitAlleWindows();
-            new BestellingLijst(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
-        });
-
-        voorraadBeheerMenuItem.setOnAction(actionEvent -> {
-            sluitAlleWindows();
-            new Voorraadonderhoud(ingelogdeGebruiker, gitaarDatabase, menu); window.close();
-        });
-
-        //stockMenu.setOnAction(actionEvent -> {new TeacherView(loggedInUser); window.close();});
-
-
-        menu.getMenus().addAll(dashboardMenu, verkopenMenu, voorraadMenu);
+        MenuBar menu = menuBarMaker.verkrijgMenu();
         container.setTop(menu);
         container.setCenter(welkomsberichtLabel);
-        content.getChildren().addAll(welkomsberichtLabel, rolLabel, tijdsLabel, grid);
+        content.getChildren().addAll(welkomsberichtLabel, rolLabel, tijdsLabel, grid, btnUitloggen);
 
         container.setCenter(content);
 

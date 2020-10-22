@@ -1,6 +1,5 @@
 package nl.inholland.GuitarShop_UI;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -15,13 +14,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_Models.*;
-import nl.inholland.GuitarShop_Service.TabelWaarden;
-
-import javax.swing.*;
-import java.util.List;
 
 public class KlantenZoekScherm {
     private final Stage window;
@@ -42,10 +38,12 @@ public class KlantenZoekScherm {
 
 
 
+
         // Set Window properties
         window.setHeight(400);
         window.setWidth(600);
-        window.setTitle("Selecteer een klant");
+        Label titelTabel = new Label("Selecteer een klant");
+        titelTabel.setFont(new Font(30));
 
         // Set containers
         BorderPane container = new BorderPane();
@@ -58,7 +56,8 @@ public class KlantenZoekScherm {
         content.setPadding(new Insets(10));
 
 
-        Label titelTabel = new Label("Klanten");
+        Label titelTableView = new Label("Klanten");
+        titelTableView.setFont(new Font(15));
         klantenZoekTableView = new TableView<>();
 
         TableColumn<Klant, String> voornaamColumn = new TableColumn<>("Voornaam");
