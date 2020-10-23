@@ -27,6 +27,11 @@ public class Dashboard {
     Stage window;
 
     public Dashboard(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase) {
+        maakDashboard(ingelogdeGebruiker, gitaarDatabase);
+    }
+
+    public void maakDashboard(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase)
+    {
         window = new Stage();
 
         window.setHeight(800);
@@ -45,18 +50,11 @@ public class Dashboard {
         welkomsberichtLabel.setFont(new Font(30));
         Label rolLabel = new Label(String.format("Rol: %s", ingelogdeGebruiker.verkrijgRol().toString()));
 
-        Date vandaag = Calendar.getInstance().getTime();
-        Label tijdsLabel = new Label(String.format("Datum en tijd: %s", vandaag));
+        Label tijdsLabel = new Label(String.format("Datum en tijd: %s", Calendar.getInstance().getTime()));
 
         Button btnUitloggen = new Button("Uitloggen");
 
-        btnUitloggen.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                window.close();
-                new LoginScherm(gitaarDatabase);
-            }
-        });
+        buttonUiloggen(gitaarDatabase, btnUitloggen);
 
         MenuBarMaker menuBarMaker = new MenuBarMaker(ingelogdeGebruiker, window, gitaarDatabase);
 
@@ -75,15 +73,14 @@ public class Dashboard {
         window.show();
     }
 
-    public static void menuAction(Menu menu) {
-        final MenuItem menuItem = new MenuItem();
-        menu.getItems().add(menuItem);
-        menu.addEventHandler(Menu.ON_SHOWN, event -> menu.hide());
-        menu.addEventHandler(Menu.ON_SHOWING, event -> menu.fire());
-    }
-
-    public void sluitAlleWindows()
+    private void buttonUiloggen(GitaarDatabase gitaarDatabase, Button btnUitloggen)
     {
-        //Platform.exit();
+        btnUitloggen.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                window.close();
+                new LoginScherm(gitaarDatabase);
+            }
+        });
     }
 }

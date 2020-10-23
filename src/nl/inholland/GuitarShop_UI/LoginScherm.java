@@ -14,14 +14,64 @@ import javafx.stage.Stage;
 import nl.inholland.GuitarShop_DAO.GitaarDatabase;
 import nl.inholland.GuitarShop_Models.Gebruiker;
 
+import javax.swing.*;
+
 public class LoginScherm {
     private Stage window;
     private GitaarDatabase gitaarDatabase;
 
-    public LoginScherm(GitaarDatabase gitaarDatabase)
+    public LoginScherm(GitaarDatabase gitaarDatabase) {
+        this.gitaarDatabase = gitaarDatabase;
+        window = new Stage();
+
+        GridPane grid = maakGridPane();
+
+        Scene scene = new Scene(grid);
+        window.setScene(scene);
+
+        window.show();
+    }
+
+    private void loginButtonAction(Button loginButton, TextField passwordInput, TextField userInput) {
+
+        loginButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String wachtwoord = passwordInput.getText();
+                String gebruikersnaam = userInput.getText();
+                Gebruiker gebruiker = null;
+                if (wachtwoord.length() != 0 && gebruikersnaam.length() != 0) {
+                    try {
+                        gebruiker = gitaarDatabase.checkInlog(gebruikersnaam, wachtwoord);
+
+                        if (gebruiker != null) {
+                            new Dashboard(gebruiker, gitaarDatabase);
+                            window.close();
+                        }
+                        else
+                        {
+                            String bericht = "De combinatie van inloggegevens zijn onjuist.";
+                            JOptionPane.showMessageDialog(null, bericht);
+                        }
+
+                    } catch (Exception exception) {
+                        String bericht = "Connectie met de database is niet gelukt.";
+                        JOptionPane.showMessageDialog(null, bericht);
+                    }
+                }
+                else
+                    {
+                    String bericht = "Vul eerst alle velden in.";
+                    JOptionPane.showMessageDialog(null, bericht);
+                }
+            }
+        });
+    }
+
+    private GridPane maakGridPane()
     {
         GridPane grid = new GridPane();
-        window = new Stage();
+
         grid.setPadding(new Insets(10, 10, 10, 10));
         grid.setVgap(10);
         grid.setHgap(10);
@@ -43,35 +93,12 @@ public class LoginScherm {
         Button loginButton = new Button("Log in");
         GridPane.setConstraints(loginButton, 1, 2);
 
-        StringProperty passwordFieldProperty = passwordInput.textProperty();
-
-        Label visiblePass = new Label();
-        GridPane.setConstraints(visiblePass, 0, 3);
-        visiblePass.textProperty().bind(passwordFieldProperty);
-
         grid.getChildren().addAll(userLabel, userInput, passwordLabel,
-                passwordInput, loginButton, visiblePass);
+                passwordInput, loginButton);
 
-        loginButton.setVisible(true);
+        loginButtonAction(loginButton, passwordInput, userInput);
 
-        loginButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                String wachtwoord = passwordInput.getText();
-                String gebruikersnaam =userInput.getText();
-                Gebruiker gebruiker = gitaarDatabase.checkInlog(gebruikersnaam, wachtwoord);
-
-                if (gebruiker != null)
-                {
-                    new Dashboard(gebruiker, gitaarDatabase);
-                    window.close();
-                }
-            }
-        });
-
-        Scene scene = new Scene(grid);
-        window.setScene(scene);
-
-        window.show();
+        return grid;
     }
+
 }

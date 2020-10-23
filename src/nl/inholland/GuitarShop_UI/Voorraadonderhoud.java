@@ -32,20 +32,28 @@ import java.util.List;
 
 public class Voorraadonderhoud {
     private List<Artikel> artikelen;
+    private GitaarDatabase gitaarDatabase;
     private Artikel artikelAangeklikt;
+    private Gebruiker ingelogdeGebruiker;
     private final Stage window;
     private TableView<Artikel> artikelenTableView;
 
     public Voorraadonderhoud(Gebruiker ingelogdeGebruiker, GitaarDatabase gitaarDatabase) {
+        this.gitaarDatabase = gitaarDatabase;
+        this.ingelogdeGebruiker = ingelogdeGebruiker;
         artikelenTableView = new TableView<>();
         artikelen = new ArrayList<>();
         window = new Stage();
 
-        // Set Window properties
-        window.setHeight(800);
-        window.setWidth(1024);
-        window.setTitle("Voorraadbeheer");
 
+        start();
+
+
+
+    }
+
+    private void start()
+    {
         // Set containers
         BorderPane container = new BorderPane();
         VBox content = new VBox(10);
@@ -57,6 +65,87 @@ public class Voorraadonderhoud {
         Label titelTabel = new Label("Artikelen");
 
 
+        artikelenTableViewMaker();
+        vulArtikelenTableView();
+        artikelenTableViewAction();
+
+        //ITEMS ONDERAAN
+
+        TextField txtArtikelVeranderVoorraad = new TextField();
+        txtArtikelVeranderVoorraad.setPromptText("Voorraad");
+
+        CheckBox cbNegatief = new CheckBox("Negatief");
+
+        Button btnToevoegen = new Button("Toevoegen");
+
+        btnToevoegenAction(btnToevoegen, txtArtikelVeranderVoorraad, cbNegatief);
+
+
+        BorderPane borderPaneArtikelenDisplay = new BorderPane();
+        GridPane gridPaneArtikelenTableView = new GridPane();
+        gridPaneArtikelenTableView.setHgap(10);
+        gridPaneArtikelenTableView.setVgap(10);
+        //ArtikelenTableView
+        Label labelVoorraad = new Label("Voorraadbeheer");
+        labelVoorraad.setFont(new Font(30));
+        gridPaneArtikelenTableView.add(labelVoorraad, 0, 0);
+        gridPaneArtikelenTableView.add(artikelenTableView, 0, 3);
+
+
+        GridPane gridPaneArtikelenKnoppen = new GridPane();
+        gridPaneArtikelenKnoppen.setHgap(10);
+        gridPaneArtikelenKnoppen.setVgap(10);
+
+        gridPaneArtikelenKnoppen.add(txtArtikelVeranderVoorraad, 0, 0);
+        gridPaneArtikelenKnoppen.add(cbNegatief, 2, 0);
+        gridPaneArtikelenKnoppen.add(btnToevoegen, 4, 0);
+
+        borderPaneArtikelenDisplay.setTop(gridPaneArtikelenTableView);
+        borderPaneArtikelenDisplay.setCenter(gridPaneArtikelenKnoppen);
+
+
+        content.getChildren().addAll(borderPaneArtikelenDisplay);
+        content.getChildren().addAll();
+        //container.setTop(menu);
+        MenuBarMaker menuBarMaker = new MenuBarMaker(ingelogdeGebruiker, window, gitaarDatabase);
+        container.setTop(menuBarMaker.verkrijgMenu());
+        container.setCenter(content);
+
+        // Set scene
+        Scene scene = new Scene(container);
+
+        windowMaker(scene);
+    }
+
+    private void windowMaker(Scene scene)
+    {
+        //WINDOW info
+        window.setHeight(800);
+        window.setWidth(1024);
+        window.setTitle("Voorraadbeheer");
+
+        //SCENE
+        window.setScene(scene);
+        window.initModality(Modality.APPLICATION_MODAL);
+
+        window.showAndWait();
+    }
+
+
+    private void vulArtikelenTableView() {
+        artikelen = gitaarDatabase.verkrijgArtikelen();
+        ObservableList<Artikel> artikelenLijstObserv = FXCollections.observableArrayList(artikelen);
+
+        for ( int i = 0; i<artikelenTableView.getItems().size(); i++) {
+            artikelenTableView.getItems().clear();
+        }
+
+        artikelenTableView.setItems(artikelenLijstObserv);
+    }
+
+    private void artikelenTableViewMaker()
+    {
+        artikelenTableView = new TableView<>();
         TableColumn<Artikel, Integer> aantalKolom = new TableColumn<>("Aantal");
         aantalKolom.setCellValueFactory(artikel -> new SimpleObjectProperty(artikel.getValue().verkrijgAantal()));
 
@@ -73,26 +162,10 @@ public class Voorraadonderhoud {
         typeKolom.setCellValueFactory(artikel -> new SimpleObjectProperty(artikel.getValue().verkrijgType()));
 
         artikelenTableView.getColumns().addAll(aantalKolom, merkKolom, modelKolom, akoestischKolom, typeKolom);
-        artikelen = gitaarDatabase.verkrijgArtikelen();
+    }
 
-        vulArtikelenTableView();
-
-        //ITEMS ONDERAAN
-
-        TextField txtArtikelVeranderVoorraad = new TextField();
-        txtArtikelVeranderVoorraad.setPromptText("Voorraad");
-
-        CheckBox cbNegatief = new CheckBox("Negatief");
-
-        Button btnToevoegen = new Button("Toevoegen");
-
-        artikelenTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                artikelAangeklikt = artikelenTableView.getSelectionModel().getSelectedItem();
-            }
-        });
-
+    private void btnToevoegenAction(Button btnToevoegen, TextField txtArtikelVeranderVoorraad, CheckBox cbNegatief)
+    {
         btnToevoegen.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -130,54 +203,19 @@ public class Voorraadonderhoud {
                 }
             }
         });
-
-
-        BorderPane borderPaneArtikelenDisplay = new BorderPane();
-        GridPane gridPaneArtikelenTableView = new GridPane();
-        gridPaneArtikelenTableView.setHgap(10);
-        gridPaneArtikelenTableView.setVgap(10);
-        //ArtikelenTableView
-        Label labelVoorraad = new Label("Voorraadbeheer");
-        labelVoorraad.setFont(new Font(30));
-        gridPaneArtikelenTableView.add(labelVoorraad, 0, 0);
-        gridPaneArtikelenTableView.add(artikelenTableView, 0, 3);
-
-
-        GridPane gridPaneArtikelenKnoppen = new GridPane();
-        gridPaneArtikelenKnoppen.setHgap(10);
-        gridPaneArtikelenKnoppen.setVgap(10);
-
-        gridPaneArtikelenKnoppen.add(txtArtikelVeranderVoorraad, 0, 0);
-        gridPaneArtikelenKnoppen.add(cbNegatief, 2, 0);
-        gridPaneArtikelenKnoppen.add(btnToevoegen, 4, 0);
-
-        borderPaneArtikelenDisplay.setTop(gridPaneArtikelenTableView);
-        borderPaneArtikelenDisplay.setCenter(gridPaneArtikelenKnoppen);
-
-
-        content.getChildren().addAll(borderPaneArtikelenDisplay);
-        content.getChildren().addAll();
-        //container.setTop(menu);
-        MenuBarMaker menuBarMaker = new MenuBarMaker(ingelogdeGebruiker, window, gitaarDatabase);
-        container.setTop(menuBarMaker.verkrijgMenu());
-        container.setCenter(content);
-
-        // Set scene
-        Scene scene = new Scene(container);
-        window.setScene(scene);
-        window.initModality(Modality.APPLICATION_MODAL);
-        // Show window
-        window.showAndWait();
-
     }
 
-    private void vulArtikelenTableView() {
-        ObservableList<Artikel> artikelenLijstObserv = FXCollections.observableArrayList(artikelen);
-
-        for ( int i = 0; i<artikelenTableView.getItems().size(); i++) {
-            artikelenTableView.getItems().clear();
-        }
-
-        artikelenTableView.setItems(artikelenLijstObserv);
+    private void artikelenTableViewAction()
+    {
+        artikelenTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try {
+                    artikelAangeklikt = artikelenTableView.getSelectionModel().getSelectedItem();
+                }
+                catch(Exception exception){}
+            }
+        });
     }
+
 }

@@ -19,6 +19,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.inholland.GuitarShop_Models.*;
 
+import javax.swing.*;
+
 public class KlantenZoekScherm {
     private final Stage window;
     private ObservableList<Klant> klanten;
@@ -32,16 +34,15 @@ public class KlantenZoekScherm {
 
     public KlantenZoekScherm(ObservableList<Klant> klanten) {
         window = new Stage();
-        window.setTitle("Klanten opzoeken");
         this.klanten = klanten;
 
+        start();
 
+    }
 
+    private void start()
+    {
 
-
-        // Set Window properties
-        window.setHeight(400);
-        window.setWidth(600);
         Label titelTabel = new Label("Selecteer een klant");
         titelTabel.setFont(new Font(30));
 
@@ -58,6 +59,60 @@ public class KlantenZoekScherm {
 
         Label titelTableView = new Label("Klanten");
         titelTableView.setFont(new Font(15));
+
+
+        //KLANTENTABLEVIEW
+        klantenZoekTableViewMaker();
+        klantenZoekTableViewAction();
+
+
+
+        content.getChildren().addAll(klantenZoekTableView, grid);
+
+
+        container.setCenter(content);
+
+        // Set scene
+        Scene scene = new Scene(container);
+        windowMaker(scene);
+    }
+
+
+    private void windowMaker(Scene scene)
+    {
+        //WINDOW titel
+        window.setTitle("Klanten opzoeken");
+
+        //WINDOW info
+        window.setHeight(400);
+        window.setWidth(600);
+
+        window.setScene(scene);
+        window.initModality(Modality.APPLICATION_MODAL);
+
+        window.showAndWait();
+    }
+
+    private void klantenZoekTableViewAction()
+    {
+        klantenZoekTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try {
+                    klantAangeklikt = klantenZoekTableView.getSelectionModel().getSelectedItem();
+                    window.close();
+                }
+                catch(Exception exception)
+                {
+                    String bericht = "Er zijn geen klanten beschikbaar.";
+                    JOptionPane.showMessageDialog(null, bericht);
+                }
+            }
+        });
+    }
+
+    private void klantenZoekTableViewMaker()
+    {
         klantenZoekTableView = new TableView<>();
 
         TableColumn<Klant, String> voornaamColumn = new TableColumn<>("Voornaam");
@@ -78,47 +133,8 @@ public class KlantenZoekScherm {
         TableColumn<Klant, String> emailadresColumn = new TableColumn<>("Emailadres");
         emailadresColumn.setCellValueFactory(artikel -> new SimpleStringProperty(artikel.getValue().verkrijgEmail()));
 
-
-        klantenZoekTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                klantAangeklikt = klantenZoekTableView.getSelectionModel().getSelectedItem();
-                //dataTabel.zetKlant(klantAangeklikt);
-
-                //new BestellingMaken(ingelogdeGebruiker);
-                window.close();
-            }
-        });
-
-
-
-        //noinspection unchecked
         klantenZoekTableView.getColumns().addAll(voornaamColumn, achternaamColumn, adresColumn, stadColumn, telefoonnummerColumn, emailadresColumn);
         klantenZoekTableView.setItems(klanten);
 
-        content.getChildren().addAll(klantenZoekTableView, grid);
-
-
-        container.setCenter(content);
-
-        // Set scene
-        Scene scene = new Scene(container);
-        window.setScene(scene);
-        window.initModality(Modality.APPLICATION_MODAL);
-        // Show window
-        window.showAndWait();
-
     }
-
-/*    public void muisKlik()
-    {
-        klantenZoekTableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                klantAangeklikt = klantenZoekTableView.getSelectionModel().getSelectedItem();
-
-                window.close();
-            }
-        });
-    }*/
 }
