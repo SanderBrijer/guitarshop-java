@@ -80,11 +80,7 @@ public class BestellingLijst {
     }
 
     private Integer verkrijgAantalArtikelen(AfgerondeBestelling afgerondeBestelling) {
-        List<BesteldeItem> besteldeItems = afgerondeBestelling.verkrijgBestelling().verkrijgBesteldeItems();
-        Integer aantal = 0;
-        for(int i=0;i<besteldeItems.size();i++){
-            aantal += besteldeItems.get(i).verkrijgAantalBesteld();
-        }
+        Integer aantal = afgerondeBestelling.verkrijgBestelling().verkrijgBesteldeItems().size();
         return aantal;
     }
 

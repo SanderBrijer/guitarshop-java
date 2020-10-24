@@ -27,19 +27,15 @@ public class BevestigBestelling {
     private final Stage window;
     private GitaarDatabase gitaarDatabase;
 
-    public BevestigBestelling(Bestelling bestelling, GitaarDatabase gitaarDatabase)
-    {
+    public BevestigBestelling(Bestelling bestelling, GitaarDatabase gitaarDatabase) {
         this.gitaarDatabase = gitaarDatabase;
         window = new Stage();
         this.bestelling = bestelling;
 
+        start();
+    }
 
-
-        // Set Window properties
-        window.setHeight(600);
-        window.setWidth(800);
-        window.setTitle("Bevestig bestelling");
-
+    private void start() {
         // Set containers
         BorderPane container = new BorderPane();
         VBox content = new VBox(10);
@@ -62,12 +58,12 @@ public class BevestigBestelling {
         Label lblKlantEmail = new Label(bestelling.verkrijgKlant().verkrijgEmail());
 
 
-        gridKlant.add(lblTitelScherm, 1,0);
-        gridKlant.add(lblKlantTitel, 1,2);
-        gridKlant.add(lblKlantNaam, 1,3);
-        gridKlant.add(lblKlantAdres, 1,4);
-        gridKlant.add(lblKlantTelefoonnummer, 1,5);
-        gridKlant.add(lblKlantEmail, 1,6);
+        gridKlant.add(lblTitelScherm, 1, 0);
+        gridKlant.add(lblKlantTitel, 1, 2);
+        gridKlant.add(lblKlantNaam, 1, 3);
+        gridKlant.add(lblKlantAdres, 1, 4);
+        gridKlant.add(lblKlantTelefoonnummer, 1, 5);
+        gridKlant.add(lblKlantEmail, 1, 6);
         borderPaneKlantDisplay.setTop(gridKlant);
 
         //BESTELDE ITEM
@@ -86,14 +82,6 @@ public class BevestigBestelling {
         Label lblBesteldeItemTitelPrijs = new Label("Prijs");
 
 
-        /*gridPaneBestelTitel.add(lblBestellingTitel, 1,0);
-        gridPaneBestelTitel.add(lblBesteldeItemTitelAantal, 1,1);
-        gridPaneBestelTitel.add(lblBesteldeItemTitelMerk, 9,1);
-        gridPaneBestelTitel.add(lblBesteldeItemTitelModel, 17,1);
-        gridPaneBestelTitel.add(lblBesteldeItemTitelType, 25,1);
-        gridPaneBestelTitel.add(lblBesteldeItemTitelPrijs, 33,1);
-        borderPaneBestellingDisplay.setTop(gridPaneBestelTitel);*/
-
 
         GridPane gridPaneBesteldeItemTitel = new GridPane();
         gridPaneBesteldeItemTitel.setHgap(10);
@@ -108,30 +96,28 @@ public class BevestigBestelling {
         gridPaneBestelInfo.setHgap(10);
         gridPaneBestelInfo.setVgap(10);
 
-        gridPaneBestelInfo.add(lblBestellingTitel, 1,0);
-        gridPaneBestelInfo.add(lblBesteldeItemTitelAantal, 1,1);
-        gridPaneBestelInfo.add(lblBesteldeItemTitelMerk, 9,1);
-        gridPaneBestelInfo.add(lblBesteldeItemTitelModel, 17,1);
-        gridPaneBestelInfo.add(lblBesteldeItemTitelType, 25,1);
-        gridPaneBestelInfo.add(lblBesteldeItemTitelPrijs, 33,1);
+        gridPaneBestelInfo.add(lblBestellingTitel, 1, 0);
+        gridPaneBestelInfo.add(lblBesteldeItemTitelAantal, 1, 1);
+        gridPaneBestelInfo.add(lblBesteldeItemTitelMerk, 9, 1);
+        gridPaneBestelInfo.add(lblBesteldeItemTitelModel, 17, 1);
+        gridPaneBestelInfo.add(lblBesteldeItemTitelType, 25, 1);
+        gridPaneBestelInfo.add(lblBesteldeItemTitelPrijs, 33, 1);
 
-        for (int i = 0; i < besteldeItems.size(); i++)
-        {
+        for (int i = 0; i < besteldeItems.size(); i++) {
 
             Label lblBesteldeItemTitelAantalUitvoer = new Label(besteldeItems.get(i).verkrijgAantalBesteld().toString());
             Label lblBesteldeItemTitelMerkUitvoer = new Label(besteldeItems.get(i).verkrijgArtikel().verkrijgMerk());
             Label lblBesteldeItemTitelModelUitvoer = new Label(besteldeItems.get(i).verkrijgArtikel().verkrijgModel());
             Label lblBesteldeItemTitelTypeUitvoer = new Label(besteldeItems.get(i).verkrijgArtikel().verkrijgType().toString());
-            Double prijsje = besteldeItems.get(i).verkrijgArtikel().verkrijgPrijs()*Double.parseDouble(besteldeItems.get(i).verkrijgAantalBesteld().toString());
+            Double prijsje = besteldeItems.get(i).verkrijgArtikel().verkrijgPrijs() * Double.parseDouble(besteldeItems.get(i).verkrijgAantalBesteld().toString());
             String prijs = String.format("%.2f", prijsje);
             Label lblBesteldeItemTitelPrijsUitvoer = new Label(prijs);
 
-            gridPaneBestelInfo.add(lblBesteldeItemTitelAantalUitvoer, 1,i+2);
-            gridPaneBestelInfo.add(lblBesteldeItemTitelMerkUitvoer, 9,i+2);
-            gridPaneBestelInfo.add(lblBesteldeItemTitelModelUitvoer, 17,i+2);
-            gridPaneBestelInfo.add(lblBesteldeItemTitelTypeUitvoer, 25,i+2);
-            gridPaneBestelInfo.add(lblBesteldeItemTitelPrijsUitvoer, 33,i+2);
-
+            gridPaneBestelInfo.add(lblBesteldeItemTitelAantalUitvoer, 1, i + 2);
+            gridPaneBestelInfo.add(lblBesteldeItemTitelMerkUitvoer, 9, i + 2);
+            gridPaneBestelInfo.add(lblBesteldeItemTitelModelUitvoer, 17, i + 2);
+            gridPaneBestelInfo.add(lblBesteldeItemTitelTypeUitvoer, 25, i + 2);
+            gridPaneBestelInfo.add(lblBesteldeItemTitelPrijsUitvoer, 33, i + 2);
 
 
             listLabelsBestellingen = new ArrayList<Label>();
@@ -144,7 +130,7 @@ public class BevestigBestelling {
             listlabels.add(listLabelsBestellingen);
             Double aantalBesteld = Double.valueOf(besteldeItems.get(i).verkrijgAantalBesteld());
             Double prijsPerBesteldeItem = Double.valueOf(besteldeItems.get(i).verkrijgArtikel().verkrijgPrijs());
-            totalePrijs += aantalBesteld*prijsPerBesteldeItem;
+            totalePrijs += aantalBesteld * prijsPerBesteldeItem;
         }
 
         borderPaneBestellingDisplay.setBottom(gridPaneBestelInfo);
@@ -158,17 +144,27 @@ public class BevestigBestelling {
 
         String totalePrijsToString = String.format("%.2f", totalePrijs);
         Label lblTotalePrijs = new Label("Totale prijs: € " + totalePrijsToString);
-        gridPaneOnder.add(lblTotalePrijs, 1,0);
+        gridPaneOnder.add(lblTotalePrijs, 1, 0);
 
         Button btnBevestigBestelling = new Button("Bevestig");
-        gridPaneOnder.add(btnBevestigBestelling, 1,2);
+        gridPaneOnder.add(btnBevestigBestelling, 1, 2);
 
         content.getChildren().addAll(borderPaneKlantDisplay, borderPaneBestellingDisplay, gridPaneOnder);
 
 
         container.setCenter(content);
 
+        btnBevestigBestellingAction(btnBevestigBestelling);
 
+
+        // Set scene
+        Scene scene = new Scene(container);
+        window.setScene(scene);
+
+        windowMaker(scene);
+    }
+
+    private void btnBevestigBestellingAction(Button btnBevestigBestelling) {
         btnBevestigBestelling.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -176,13 +172,15 @@ public class BevestigBestelling {
                 window.close();
             }
         });
+    }
 
-        // Set scene
-        Scene scene = new Scene(container);
+    private void windowMaker(Scene scene) {
+        window.setHeight(500);
+        window.setWidth(700);
+        window.setTitle("Bestelling bevestigen.");
+
         window.setScene(scene);
-
         window.initModality(Modality.APPLICATION_MODAL);
-
         // Show window
         window.showAndWait();
     }

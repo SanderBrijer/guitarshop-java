@@ -34,9 +34,6 @@ public class Dashboard {
     {
         window = new Stage();
 
-        window.setHeight(800);
-        window.setWidth(1024);
-        window.setTitle("Dashboard");
 
         BorderPane container = new BorderPane();
         VBox content = new VBox(10);
@@ -67,9 +64,20 @@ public class Dashboard {
 
         // Set scene
         Scene scene = new Scene(container);
+        windowMaker(scene);
+    }
+
+    private void windowMaker(Scene scene)
+    {
+        //WINDOW info
+        window.setHeight(800);
+        window.setWidth(1024);
+        window.setTitle("Dashboard");
+
+        //SCENE
         window.setScene(scene);
         window.initModality(Modality.APPLICATION_MODAL);
-        // Show window
+
         window.show();
     }
 

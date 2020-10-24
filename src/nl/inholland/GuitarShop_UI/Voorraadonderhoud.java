@@ -178,6 +178,11 @@ public class Voorraadonderhoud {
 
                             if (cbNegatief.isSelected()) {
                                 gitaarDatabase.verlaagVoorraadArtikel(artikelAangeklikt, veranderAantal);
+                                if (artikelAangeklikt.verkrijgAantal() < 0)
+                                {
+                                    String st = "LET OP!\nEr is een negatief aantal in de database van het artikel " + artikelAangeklikt.verkrijgModel() + ".";
+                                    JOptionPane.showMessageDialog(null, st);
+                                }
                             } else {
                                 gitaarDatabase.verhoogVoorraadArtikel(artikelAangeklikt, veranderAantal);
                             }

@@ -77,7 +77,11 @@ public class BestellingMaken {
 
 
         window = new Stage();
+        start();
+    }
 
+    private void start()
+    {
 
         ObservableList<Artikel> artikelen = FXCollections.observableList(database.verkrijgArtikelen());
 
@@ -130,33 +134,7 @@ public class BestellingMaken {
 
         // Klant displayen
         BorderPane borderPaneKlantDisplay = new BorderPane();
-        GridPane gridKlantDisplay = new GridPane();
-
-        gridKlantDisplay.setHgap(10);
-        gridKlantDisplay.setVgap(10);
-
-        gridKlantDisplay.setBackground(new Background(new BackgroundFill(Color.rgb(0, 255, 153), null, new Insets(-10))));
-        //gridKlantDisplay.setBackground(Color.lightGray);
-
-        gridKlantDisplay.add(klantVoornaamLabel, 0, 0);
-        gridKlantDisplay.add(klantVoornaamUitvoerLabel, 1, 0);
-
-        gridKlantDisplay.add(klantAchternaamLabel, 0, 1);
-        gridKlantDisplay.add(klantAchternaamUitvoerLabel, 1, 1);
-
-        gridKlantDisplay.add(klantAdresLabel, 0, 2);
-        gridKlantDisplay.add(klantAdresUitvoerLabel, 1, 2);
-
-
-        gridKlantDisplay.add(klantStadLabel, 5, 0);
-        gridKlantDisplay.add(klantStadUitvoerLabel, 6, 0);
-
-        gridKlantDisplay.add(klantTelefoonnummerLabel, 5, 1);
-        gridKlantDisplay.add(klantTelefoonnummerUitvoerLabel, 6, 1);
-
-        gridKlantDisplay.add(klantEmailadresLabel, 5, 2);
-        gridKlantDisplay.add(klantEmailadresUitvoerLabel, 6, 2);
-
+        GridPane gridKlantDisplay = gridKlantDisplayMaker();
         borderPaneKlantOpzoeken.setTop(grid);
         borderPaneKlantOpzoeken.setRight(gridKlantDisplay);
 
@@ -199,7 +177,11 @@ public class BestellingMaken {
         Scene scene = new Scene(container);
         windowMaker(scene);
 
+        menuBarAction(menuBarMaker);
+    }
 
+    private void menuBarAction(MenuBarMaker menuBarMaker)
+    {
         menuBarMaker.verkrijgDashboardMenuItem().setOnAction(actionEvent -> {
             bestellingAnnuleren();
         });
@@ -224,6 +206,39 @@ public class BestellingMaken {
             bestellingAnnuleren();
         });
     }
+
+
+    private GridPane gridKlantDisplayMaker()
+    {
+        GridPane gridKlantDisplay = new GridPane();
+
+        gridKlantDisplay.setHgap(10);
+        gridKlantDisplay.setVgap(10);
+
+        gridKlantDisplay.setBackground(new Background(new BackgroundFill(Color.rgb(0, 255, 153), null, new Insets(-10))));
+        //gridKlantDisplay.setBackground(Color.lightGray);
+
+        gridKlantDisplay.add(klantVoornaamLabel, 0, 0);
+        gridKlantDisplay.add(klantVoornaamUitvoerLabel, 1, 0);
+
+        gridKlantDisplay.add(klantAchternaamLabel, 0, 1);
+        gridKlantDisplay.add(klantAchternaamUitvoerLabel, 1, 1);
+
+        gridKlantDisplay.add(klantAdresLabel, 0, 2);
+        gridKlantDisplay.add(klantAdresUitvoerLabel, 1, 2);
+
+
+        gridKlantDisplay.add(klantStadLabel, 5, 0);
+        gridKlantDisplay.add(klantStadUitvoerLabel, 6, 0);
+
+        gridKlantDisplay.add(klantTelefoonnummerLabel, 5, 1);
+        gridKlantDisplay.add(klantTelefoonnummerUitvoerLabel, 6, 1);
+
+        gridKlantDisplay.add(klantEmailadresLabel, 5, 2);
+        gridKlantDisplay.add(klantEmailadresUitvoerLabel, 6, 2);
+        return gridKlantDisplay;
+    }
+
 
     private void klantZoekenKnopAction(Button klantZoekenKnop, TextField klantNaamInvoer) {
         klantZoekenKnop.setOnAction(new EventHandler<ActionEvent>() {
@@ -330,6 +345,7 @@ public class BestellingMaken {
         typeColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgType()));
 
         TableColumn<BesteldeItem, Double> prijsColumn = new TableColumn<>("Prijs");
+        prijsColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(String.format("%.2f", Double.parseDouble(besteldeItem.getValue().verkrijgAantalBesteld().toString()) * besteldeItem.getValue().verkrijgArtikel().verkrijgPrijs())));
 
         //noinspection unchecked
         artikelenTableView.getColumns().addAll(aantalColumn, merkColumn, modelColumn, akoestischColumn, typeColumn, prijsColumn);
