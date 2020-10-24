@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BestellingMaken{
+public class BestellingMaken {
     private final Stage window;
     private Gebruiker ingelogdeGebruiker;
     GitaarDatabase database;
@@ -77,12 +77,10 @@ public class BestellingMaken{
 
 
         window = new Stage();
+
+
         ObservableList<Artikel> artikelen = FXCollections.observableList(database.verkrijgArtikelen());
 
-        // Set Window properties
-        window.setHeight(800);
-        window.setWidth(1024);
-        window.setTitle("Bestelling aanmaken");
 
         // Set containers
         BorderPane container = new BorderPane();
@@ -100,49 +98,11 @@ public class BestellingMaken{
         klantNaamInvoer.setPromptText("Naam klant");
         Button klantZoekenKnop = new Button("Zoeken");
 
-        klantZoekenKnop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                String naam = klantNaamInvoer.getText();
-                List<Klant> klanten = verkrijgKlantViaNaam(naam);
-                ObservableList<Klant> listKlanten = FXCollections.observableArrayList(klanten);
-                klantenzoek = new KlantenZoekScherm(listKlanten);
-                klant = klantenzoek.getKlantAangeklikt();
-                vulKlantInfo(klant);
-                klantNaamInvoer.clear();
-            }
-        });
-
-        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent event) {
-                bestellingAnnuleren();
-                window.close();
-            }
-        });
+        klantZoekenKnopAction(klantZoekenKnop, klantNaamInvoer);
 
 
         Label titelTabel = new Label("Artikelen");
-
-        TableColumn<BesteldeItem, Integer> aantalColumn = new TableColumn<>("Aantal");
-        aantalColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgAantalBesteld()));
-
-        TableColumn<BesteldeItem, String> merkColumn = new TableColumn<>("Merk");
-        merkColumn.setCellValueFactory(besteldeItem -> new SimpleStringProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgMerk()));
-
-        TableColumn<BesteldeItem, String> modelColumn = new TableColumn<>("Model");
-        modelColumn.setCellValueFactory(besteldeItem -> new SimpleStringProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgModel()));
-
-        TableColumn<BesteldeItem, Boolean> akoestischColumn = new TableColumn<>("Akoestisch");
-        akoestischColumn.setCellValueFactory(besteldeItem -> new SimpleBooleanProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgAkoestisch()));
-
-        TableColumn<BesteldeItem, TypeGitaar> typeColumn = new TableColumn<>("Type");
-        typeColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgType()));
-
-        TableColumn<BesteldeItem, Double> prijsColumn = new TableColumn<>("Prijs");
-
-        //noinspection unchecked
-        artikelenTableView.getColumns().addAll(aantalColumn, merkColumn, modelColumn, akoestischColumn, typeColumn, prijsColumn);
+        artikelenTableViewMaker();
 
 
         Button verwijderenArtikelKnop = new Button("Verwijderen artikel");
@@ -150,73 +110,10 @@ public class BestellingMaken{
         Button bevestigArtikelenKnop = new Button("Bevestig");
         Button resetArtikelenKnop = new Button("Reset");
 
-
-        toevoegenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                artikelToevoegen = new ArtikelToevoegen(database);
-                if (artikelToevoegen.verkrijgBestelling() != null) {
-                    BesteldeItem besteldeItem = artikelToevoegen.verkrijgBestelling();
-                    bestelling.toevoegenAanBesteldeItems(besteldeItem);
-                }
-                vulTableViewBestellingen();
-            }
-        });
-
-        verwijderenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                try {
-                    BesteldeItem besteldeItem = artikelenTableView.getSelectionModel().getSelectedItem();
-                    if (besteldeItem != null) {
-                        verwijderArtikelUitLijst(besteldeItem);
-                        vulTableViewBestellingen();
-                    }
-                    else
-                    {
-                        String bericht = "Selecteer eerst een artikel.";
-                        JOptionPane.showMessageDialog(null, bericht);
-                    }
-                }
-                catch(Exception exception)
-                {
-                    String bericht = "Verwijderen van het artikel is niet gelukt.";
-                    JOptionPane.showMessageDialog(null, bericht);
-                }
-            }
-        });
-
-        resetArtikelenKnop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                while (artikelenTableView.getItems().size() != 0) {
-                    BesteldeItem besteldeItem = artikelenTableView.getItems().get(0);
-                    verwijderArtikelUitLijst(besteldeItem);
-                    vulTableViewBestellingen();
-                }
-            }
-        });
-
-        bevestigArtikelenKnop.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (klant != null) {
-                    if (bestelling.verkrijgBesteldeItems().size() <= 0) {
-                        String bericht = "Er zijn geen artikelen toegevoegd.";
-                        JOptionPane.showMessageDialog(null, bericht);
-                    } else {
-                        bestelling.zetKlant(klant);
-                        BevestigBestelling bevestigBestelling = new BevestigBestelling(bestelling, database);
-                        window.close();
-                        new Dashboard(ingelogdeGebruiker, database);
-
-                    }
-                } else {
-                    String st = "Er is geen klant ingevoerd";
-                    JOptionPane.showMessageDialog(null, st);
-                }
-            }
-        });
+        toevoegenArtikelKnopAction(toevoegenArtikelKnop);
+        verwijderenArtikelKnopAction(verwijderenArtikelKnop);
+        resetArtikelenKnopAction(resetArtikelenKnop);
+        bevestigArtikelenKnopAction(bevestigArtikelenKnop);
 
         // klant opzoeken
         BorderPane borderPaneKlantOpzoeken = new BorderPane();
@@ -300,30 +197,142 @@ public class BestellingMaken{
 
         // Set scene
         Scene scene = new Scene(container);
-        window.setScene(scene);
-        window.initModality(Modality.APPLICATION_MODAL);
-        // Show window
-        window.show();
+        windowMaker(scene);
 
 
         menuBarMaker.verkrijgDashboardMenuItem().setOnAction(actionEvent -> {
             bestellingAnnuleren();
         });
+
+
         menuBarMaker.verkrijgVerkopenBestellingMenuItem().setOnAction(actionEvent -> {
             bestellingAnnuleren();
         });
+
         menuBarMaker.verkrijgVerkopenBestellingenlijstMenuItem().setOnAction(actionEvent -> {
 
             bestellingAnnuleren();
             window.close();
             new BestellingLijst(ingelogdeGebruiker, database);
         });
+
         menuBarMaker.verkrijgVoorraadBestellingMenuItem().setOnAction(actionEvent -> {
             bestellingAnnuleren();
         });
+
         menuBarMaker.verkrijgVoorraadBeheerMenuItem().setOnAction(actionEvent -> {
             bestellingAnnuleren();
         });
+    }
+
+    private void klantZoekenKnopAction(Button klantZoekenKnop, TextField klantNaamInvoer) {
+        klantZoekenKnop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String naam = klantNaamInvoer.getText();
+                List<Klant> klanten = verkrijgKlantViaNaam(naam);
+                ObservableList<Klant> listKlanten = FXCollections.observableArrayList(klanten);
+                klantenzoek = new KlantenZoekScherm(listKlanten);
+                klant = klantenzoek.getKlantAangeklikt();
+                vulKlantInfo(klant);
+                klantNaamInvoer.clear();
+            }
+        });
+
+    }
+
+    //KNOPPEN
+    private void toevoegenArtikelKnopAction(Button toevoegenArtikelKnop)
+    {
+        toevoegenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                artikelToevoegen = new ArtikelToevoegen(database);
+                if (artikelToevoegen.verkrijgBestelling() != null) {
+                    BesteldeItem besteldeItem = artikelToevoegen.verkrijgBestelling();
+                    bestelling.toevoegenAanBesteldeItems(besteldeItem);
+                }
+                vulTableViewBestellingen();
+            }
+        });
+    }
+    private void verwijderenArtikelKnopAction(Button verwijderenArtikelKnop) {
+        verwijderenArtikelKnop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    BesteldeItem besteldeItem = artikelenTableView.getSelectionModel().getSelectedItem();
+                    if (besteldeItem != null) {
+                        verwijderArtikelUitLijst(besteldeItem);
+                        vulTableViewBestellingen();
+                    } else {
+                        String bericht = "Selecteer eerst een artikel.";
+                        JOptionPane.showMessageDialog(null, bericht);
+                    }
+                } catch (Exception exception) {
+                    String bericht = "Verwijderen van het artikel is niet gelukt.";
+                    JOptionPane.showMessageDialog(null, bericht);
+                }
+            }
+        });
+    }
+    private void resetArtikelenKnopAction(Button resetArtikelenKnop) {
+        resetArtikelenKnop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                while (artikelenTableView.getItems().size() != 0) {
+                    BesteldeItem besteldeItem = artikelenTableView.getItems().get(0);
+                    verwijderArtikelUitLijst(besteldeItem);
+                    vulTableViewBestellingen();
+                }
+            }
+        });
+    }
+    private void bevestigArtikelenKnopAction(Button bevestigArtikelenKnop) {
+        bevestigArtikelenKnop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (klant != null) {
+                    if (bestelling.verkrijgBesteldeItems().size() <= 0) {
+                        String bericht = "Er zijn geen artikelen toegevoegd.";
+                        JOptionPane.showMessageDialog(null, bericht);
+                    } else {
+                        bestelling.zetKlant(klant);
+                        BevestigBestelling bevestigBestelling = new BevestigBestelling(bestelling, database);
+                        window.close();
+                        new Dashboard(ingelogdeGebruiker, database);
+
+                    }
+                } else {
+                    String st = "Er is geen klant ingevoerd";
+                    JOptionPane.showMessageDialog(null, st);
+                }
+            }
+        });
+    }
+
+
+    private void artikelenTableViewMaker() {
+
+        TableColumn<BesteldeItem, Integer> aantalColumn = new TableColumn<>("Aantal");
+        aantalColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgAantalBesteld()));
+
+        TableColumn<BesteldeItem, String> merkColumn = new TableColumn<>("Merk");
+        merkColumn.setCellValueFactory(besteldeItem -> new SimpleStringProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgMerk()));
+
+        TableColumn<BesteldeItem, String> modelColumn = new TableColumn<>("Model");
+        modelColumn.setCellValueFactory(besteldeItem -> new SimpleStringProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgModel()));
+
+        TableColumn<BesteldeItem, Boolean> akoestischColumn = new TableColumn<>("Akoestisch");
+        akoestischColumn.setCellValueFactory(besteldeItem -> new SimpleBooleanProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgAkoestisch()));
+
+        TableColumn<BesteldeItem, TypeGitaar> typeColumn = new TableColumn<>("Type");
+        typeColumn.setCellValueFactory(besteldeItem -> new SimpleObjectProperty(besteldeItem.getValue().verkrijgArtikel().verkrijgType()));
+
+        TableColumn<BesteldeItem, Double> prijsColumn = new TableColumn<>("Prijs");
+
+        //noinspection unchecked
+        artikelenTableView.getColumns().addAll(aantalColumn, merkColumn, modelColumn, akoestischColumn, typeColumn, prijsColumn);
     }
 
     public List<Klant> verkrijgKlantViaNaam(String naam) {
@@ -331,7 +340,25 @@ public class BestellingMaken{
         return klanten.stream().filter(klant -> klant.verkrijgVoornaam().toLowerCase().contains(naam.toLowerCase())).collect(Collectors.toList());
     }
 
-    public void vulKlantInfo(Klant klant) {
+    private void windowMaker(Scene scene) {
+        window.setHeight(800);
+        window.setWidth(1024);
+        window.setTitle("Bestelling aanmaken");
+
+        window.setScene(scene);
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.show();
+
+        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(final WindowEvent event) {
+                bestellingAnnuleren();
+                window.close();
+            }
+        });
+    }
+
+    private void vulKlantInfo(Klant klant) {
         if (klant != null) {
             klantVoornaamUitvoerLabel.setText(klant.verkrijgVoornaam());
             klantAchternaamUitvoerLabel.setText(klant.verkrijgAchternaam());
@@ -342,7 +369,7 @@ public class BestellingMaken{
         }
     }
 
-    public void vulTableViewBestellingen() {
+    private void vulTableViewBestellingen() {
         try {
             ObservableList<BesteldeItem> mapMetBestellingen = FXCollections.observableList(bestelling.verkrijgBesteldeItems());
 
@@ -354,12 +381,12 @@ public class BestellingMaken{
         }
     }
 
-    public void verwijderArtikelUitLijst(BesteldeItem besteldeItem) {
+    private void verwijderArtikelUitLijst(BesteldeItem besteldeItem) {
         bestelling.verwijderVanBesteldeItems(besteldeItem);
         database.verhoogVoorraadArtikel(besteldeItem.verkrijgArtikel(), besteldeItem.verkrijgAantalBesteld());
     }
 
-    public void bestellingAnnuleren() {
+    private void bestellingAnnuleren() {
         while (bestellingenLijst.size() != 0) {
             BesteldeItem besteldeItem = bestellingenLijst.get(0);
             verwijderArtikelUitLijst(besteldeItem);
